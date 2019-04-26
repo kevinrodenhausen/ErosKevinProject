@@ -34,7 +34,7 @@ while True:
             print('Done sending')
             #conn.send('Thank you for connecting')
         except:
-            conn.send(("Server could not find file: " + str(data.decode())))
+            conn.send(("Server could not find file: " + str(data.decode())).encode())
         conn.close()
     
     else:

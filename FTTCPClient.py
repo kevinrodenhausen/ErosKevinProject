@@ -18,6 +18,7 @@ port = 50000
 
 clientSocket.connect((host, port))
 if input("Would you like to request a specific file or directory? (F / D): ") == "F":
+    success = False
     targetFile = input("What is the name of the file? (include '.txt'): ")
     clientSocket.send((targetFile).encode())
     with open(targetFile, 'wb') as f:
@@ -25,24 +26,32 @@ if input("Would you like to request a specific file or directory? (F / D): ") ==
         while True:
             print('receiving data...')
             data = clientSocket.recv(1024)
+            print(data.decode())
             if str(data.decode()).startswith("Server could not"):
                 f.close()
-                print("File not found on server, file transfer aborted.")
+                print("File not found on server, file transfer aborted. New file "
+                      + "created in directory is empty.")
+                clientSocket.close()
+                print('connection closed')
+                break
             print('data=%s', (data))
             if not data:
                 break
             f.write(data)
+            success = True
     f.close()
-    print('Successfully get the file')
-    clientSocket.close()
-    print('connection closed')
+    if success == True:
+        print('Successfully get the file')
+        clientSocket.close()
+        print('connection closed')
 else:
     targetDirectory = input("What is the name of the directory?: ")
     clientSocket.send((targetDirectory).encode())
     filesList = clientSocket.recv(1024)
     if str(filesList.decode()).startswith("Server could not"):
-        print(str(filesList.decode))
+        print(str(filesList.decode()))
         clientSocket.close()
+        print("connection closed")
     else:
         print(str(filesList.decode()).split())
         clientSocket.close()

@@ -14,32 +14,30 @@ serverSocket = socket(AF_INET, SOCK_STREAM)
 host = "" # Use localhost
 serverSocket.bind((host, port))            
 serverSocket.listen(5)
-print('Server listening....')
+print("Server ready to connect....")
 
 while True:
     conn, addr = serverSocket.accept()     # Establish connection with client.
     print('Got connection from', addr)
     data = conn.recv(1024)
     if str(data.decode()).endswith(".txt"):  
-        print("Server received", data.decode())
+        print("Server received:", data.decode())
         try:
-            f = open(data.decode(),'rb')
+            f = open(str(data.decode()), "rb")
             l = f.read(1024)
             while (l):
                conn.send(l)
-               print('Sent ',repr(l))
+               print("Sent:", l.decode())
                l = f.read(1024)
             f.close()
-    
-            print('Done sending')
-            #conn.send('Thank you for connecting')
+            print("Done sending file contents")
         except:
-            conn.send(("Server could not find file: " + str(data.decode())).encode())
+            conn.send(("Server could not find file: " + data.decode()).encode())
         conn.close()
     
     else:
-        print('Server received', str(data.decode()))
-        directoryName = str(data.decode())
+        print("Server received", data.decode())
+        directoryName = data.decode()
         path = os.getcwd()
         directoryPath = path + "\\" + directoryName
         print(directoryPath)
